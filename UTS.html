@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="id">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>JADWAL KAPAL SURABAYA</title>
+        <style>
+            *{
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+
+            body{
+                font-family: Arial, sans-serif;
+                background: #e8f1ef;
+                color: #16313a;
+                line-height: 1.5;
+            }
+
+            header{
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 12px;
+                background: #0f3d4c;
+                color: white;
+                padding: 16px 5%;
+            }
+
+            nav{
+                display: flex;
+                gap: 20px;
+            }
+
+            nav a{
+                color: white;
+                text-decoration: none;
+                font-weight: bold;
+            }
+
+            nav a:hover{
+                color: #e4572e;
+            }
+
+            main{
+                display: flex;
+                flex-direction: column;
+                gap: 23px;
+                padding: 23px 5%;
+            }
+
+            .bawah{
+                display: flex;
+                flex-wrap: wrap;
+                gap: 23px;
+                align-items: flex-start;
+            }
+
+            .bawah section{
+                flex: 1 1 340px;
+            }
+
+            section{
+                background: white;
+                padding: 20px;
+                border-radius: 6px;
+                border: 1px solid #c5d8d4;
+            }
+
+            h2{
+                margin-bottom: 8px;
+            }
+
+            .ket{
+                color: #4b6a72;
+                margin-bottom: 12px;
+            }
+
+            .gulir{
+                overflow-x: auto;
+            }
+
+            table{
+                width: 100%;
+                border-collapse: collapse;
+                min-width: 420px;
+            }
+
+            th, td{
+                text-align: left;
+                padding: 10px;
+                border-bottom: 1px solid #c5d8d4;
+            }
+
+            th{
+                background: #e8f1ef;
+            }
+
+            .tepat { color: #1d7a4d; font-weight: bold; }
+            .tunda { color: #e4572e; font-weight: bold; }
+
+            form{
+                display: flex;
+                flex-direction: column;
+                gap: 14px;
+            }
+
+            label{
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+                font-weight: bold;
+            }
+
+            input, select{
+                padding: 10px;
+                font-size: 1rem;
+                border: 1px solid #9db8b2;
+                border-radius: 4px;
+            }
+
+            #cari{
+                width: 100%;
+                margin-bottom: 12px;
+            }
+
+            button{
+                background: #e4572e;
+                color: white;
+                border: 0;
+                border-radius: 4px;
+                padding: 12px;
+                font-size: 1rem;
+                cursor: pointer;
+            }
+
+            button:hover {
+                background: #c9441f;
+            }
+
+            .hapus {
+                padding: 4px 10px;
+                font-size: 0.9rem;
+            }
+
+            footer {
+                background: #0f3d4c;
+                color: #cfe3de;
+                padding: 20px 5%;
+                font-size: 0.9rem;
+            }
+        </style>
+    </head>
+
+    <body>
+        <header>
+            <h1>JADWAL KAPAL SURABAYA</h1>
+            <nav>
+                <a href="#jadwal">Jadwal</a>
+                <a href="#pesan">Pesan tiket</a>
+                <a href="#pesanan">Pesanan saya</a>
+            </nav>
+        </header>
+
+        <main>
+            <section id="jadwal">
+                <h2>Jadwal keberangkatan</h2>
+                <p class="ket">Data contoh untuk tugas, bukan jadwal resmi.</p>
+                <input type="search" id="cari" placeholder="Cari nama kapal atau tujuan">
+
+                <div class="gulir">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Kapal</th>
+                                <th>Rute</th>
+                                <th>Berangkat</th>
+                                <th>Kelas</th>
+                                <th>Harga</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="isiJadwal"></tbody>
+                    </table>
+                </div>
+                <p id="kosong" hidden>Tidak ada kapal yang cocok dengan pencarian.</p>
+            </section>
+
+            <div class="bawah">
+                <section id="pesan">
+                    <h2>Pesan tiket</h2>
+                    <form id="formPesan">
+                        <label>Nama penumpang
+                            <input type="text" id="nama" required minlength="3">
+                        </label>
+
+                        <label>Kapal
+                            <select id="pilihKapal"></select>
+                        </label>
+
+                        <label>Jumlah tiket
+                            <input type="number" id="jumlah" min="1" max="10" value="1" required>
+                        </label>
+
+                        <p>Total bayar: <strong id="total">Rp 0</strong></p>
+
+                        <button type="submit">Simpan pesanan</button>
+                    </form>
+                </section>
+
+                <section id="pesanan">
+                    <h2>Pesanan saya</h2>
+                    <p id="ringkasan">Belum ada pesanan.</p>
+                    <div class="gulir">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nama</th>
+                                    <th>Kapal</th>
+                                    <th>Tiket</th>
+                                    <th>Total</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="isiPesanan"></tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <footer>UTS pemrograman web</footer>
+
+        <script>
+            const jadwal = [
+                { kapal: "KM Sinar Laut",      rute: "Surabaya - Banjarmasin",  berangkat: "08:00", kelas: "Ekonomi", harga: 285000, status: "Tepat waktu" },
+                { kapal: "KM Bintang Timur",   rute: "Surabaya - Balikpapan",   berangkat: "10:30", kelas: "Bisnis",  harga: 410000, status: "Tepat waktu" },
+                { kapal: "KM Teluk Bone",      rute: "Surabaya - Makassar",     berangkat: "19:00", kelas: "Ekonomi", harga: 195000, status: "Tertunda" },
+                { kapal: "KM Samudra Indah",   rute: "Surabaya - Labuan Bajo",  berangkat: "21:00", kelas: "VIP",     harga: 650000, status: "Tepat waktu" },
+                { kapal: "KM Pesisir Selatan", rute: "Surabaya - Jakarta",      berangkat: "07:00", kelas: "Ekonomi", harga: 120000, status: "Tepat waktu" },
+                { kapal: "KM Fajar Nusantara", rute: "Surabaya - Kupang",       berangkat: "16:00", kelas: "Bisnis",  harga: 330000, status: "Tertunda" }
+            ];
+
+            let pesanan = [];
+
+            const isiJadwal  = document.getElementById("isiJadwal");
+            const cari       = document.getElementById("cari");
+            const kosong     = document.getElementById("kosong");
+            const pilihKapal = document.getElementById("pilihKapal");
+            const jumlah     = document.getElementById("jumlah");
+            const total      = document.getElementById("total");
+            const formPesan  = document.getElementById("formPesan");
+            const isiPesanan = document.getElementById("isiPesanan");
+            const ringkasan  = document.getElementById("ringkasan");
+
+            function rupiah(angka) {
+                return "Rp " + angka.toLocaleString("id-ID");
+            }
+
+            function tampilJadwal() {
+                const kata = cari.value.toLowerCase();
+
+                const hasil = jadwal.filter(function (j) {
+                    return (j.kapal + " " + j.rute).toLowerCase().includes(kata);
+                });
+
+                let html = "";
+                hasil.forEach(function (j) {
+                    const warna = j.status === "Tepat waktu" ? "tepat" : "tunda";
+                    html += `
+                        <tr>
+                            <td>${j.kapal}</td>
+                            <td>${j.rute}</td>
+                            <td>${j.berangkat}</td>
+                            <td>${j.kelas}</td>
+                            <td>${rupiah(j.harga)}</td>
+                            <td class="${warna}">${j.status}</td>
+                        </tr>`;
+                });
+
+                isiJadwal.innerHTML = html;
+                kosong.hidden = hasil.length > 0;
+            }
+
+            cari.addEventListener("input", tampilJadwal);
+
+            jadwal.forEach(function (j, i) {
+                pilihKapal.innerHTML += `<option value="${i}">${j.kapal} - ${j.rute} (${rupiah(j.harga)})</option>`;
+            });
+
+            function hitungTotal() {
+                const harga = jadwal[pilihKapal.value].harga;
+                const banyak = Number(jumlah.value) || 0;
+                total.textContent = rupiah(harga * banyak);
+            }
+
+            pilihKapal.addEventListener("change", hitungTotal);
+            jumlah.addEventListener("input", hitungTotal);
+
+            function tampilPesanan() {
+                let html = "";
+                let jumlahBayar = 0;
+
+                pesanan.forEach(function (p, i) {
+                    jumlahBayar += p.total;
+                    html += `
+                        <tr>
+                            <td>${p.nama}</td>
+                            <td>${p.kapal}</td>
+                            <td>${p.jumlah}</td>
+                            <td>${rupiah(p.total)}</td>
+                            <td><button class="hapus" data-i="${i}">Hapus</button></td>
+                        </tr>`;
+                });
+
+                isiPesanan.innerHTML = html;
+
+                if (pesanan.length === 0) {
+                    ringkasan.textContent = "Belum ada pesanan.";
+                } else {
+                    ringkasan.textContent = pesanan.length + " pesanan, total " + rupiah(jumlahBayar);
+                }
+            }
+
+            formPesan.addEventListener("submit", function (e) {
+                e.preventDefault();
+
+                const kapalDipilih = jadwal[pilihKapal.value];
+                const banyak = Number(jumlah.value);
+
+                pesanan.push({
+                    nama: document.getElementById("nama").value.replace(/[<>]/g, ""),
+                    kapal: kapalDipilih.kapal,
+                    jumlah: banyak,
+                    total: kapalDipilih.harga * banyak
+                });
+
+                tampilPesanan();
+                formPesan.reset();
+                hitungTotal();
+            });
+
+            isiPesanan.addEventListener("click", function (e) {
+                if (e.target.classList.contains("hapus")) {
+                    const nomor = Number(e.target.dataset.i);
+                    pesanan.splice(nomor, 1);
+                    tampilPesanan();
+                }
+            });
+
+            tampilJadwal();
+            hitungTotal();
+            tampilPesanan();
+        </script>
+    </body>
+</html>
